@@ -128,7 +128,7 @@ class Linkify extends StatelessWidget {
               decoration: TextDecoration.underline,
             )
             .merge(linkStyle),
-        buildText: buildLinkText,
+        buildLinkText: buildLinkText,
       ),
     );
   }
@@ -253,7 +253,7 @@ class SelectableLinkify extends StatelessWidget {
         elements,
         style: Theme.of(context).textTheme.bodyText2.merge(style),
         onOpen: onOpen,
-        buildText: buildLinkText,
+        buildLinkText: buildLinkText,
         linkStyle: Theme.of(context)
             .textTheme
             .bodyText2
