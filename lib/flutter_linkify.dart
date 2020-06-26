@@ -18,6 +18,9 @@ export 'package:linkify/linkify.dart'
 /// Callback clicked link
 typedef LinkCallback = void Function(LinkableElement link);
 
+/// Link text custom builder
+typedef String LinkTextBuilder(String text);
+
 /// Turns URLs into links
 class Linkify extends StatelessWidget {
   /// Text to be linkified
@@ -70,6 +73,9 @@ class Linkify extends StatelessWidget {
   /// Defines how to measure the width of the rendered text.
   final TextWidthBasis textWidthBasis;
 
+  /// Function for dynamic text building
+  final LinkTextBuilder buildLinkText;
+
   /// Defines how the paragraph will apply TextStyle.height to the ascent of the first line and descent of the last line.
   final TextHeightBehavior? textHeightBehavior;
 
@@ -92,6 +98,7 @@ class Linkify extends StatelessWidget {
     this.strutStyle,
     this.locale,
     this.textWidthBasis = TextWidthBasis.parent,
+    this.buildLinkText,
     this.textHeightBehavior,
   }) : super(key: key);
 
@@ -117,6 +124,7 @@ class Linkify extends StatelessWidget {
               decoration: TextDecoration.underline,
             )
             .merge(linkStyle),
+        buildText: buildLinkText,
       ),
       textAlign: textAlign,
       textDirection: textDirection,
@@ -221,6 +229,8 @@ class SelectableLinkify extends StatelessWidget {
   /// Called when the user changes the selection of text (including the cursor location).
   final SelectionChangedCallback? onSelectionChanged;
 
+  final LinkTextBuilder buildLinkText;
+
   const SelectableLinkify({
     Key? key,
     required this.text,
@@ -253,6 +263,7 @@ class SelectableLinkify extends StatelessWidget {
     this.cursorHeight,
     this.selectionControls,
     this.onSelectionChanged,
+    this.buildLinkText,
   }) : super(key: key);
 
   @override
@@ -268,6 +279,7 @@ class SelectableLinkify extends StatelessWidget {
         elements,
         style: Theme.of(context).textTheme.bodyText2?.merge(style),
         onOpen: onOpen,
+        buildText: buildLinkText,
         linkStyle: Theme.of(context)
             .textTheme
             .bodyText2
@@ -303,47 +315,31 @@ class SelectableLinkify extends StatelessWidget {
   }
 }
 
-class LinkableSpan extends WidgetSpan {
-  LinkableSpan({
-    required MouseCursor mouseCursor,
-    required InlineSpan inlineSpan,
-  }) : super(
-          child: MouseRegion(
-            cursor: mouseCursor,
-            child: Text.rich(
-              inlineSpan,
-            ),
-          ),
-        );
-}
-
 /// Raw TextSpan builder for more control on the RichText
 TextSpan buildTextSpan(
   List<LinkifyElement> elements, {
   TextStyle? style,
   TextStyle? linkStyle,
   LinkCallback? onOpen,
+  LinkTextBuilder buildLinkText,
 }) {
   return TextSpan(
-    children: elements.map<WidgetSpan>(
+    children: elements.map<TextSpan>(
       (element) {
         if (element is LinkableElement) {
-          return LinkableSpan(
-            mouseCursor: SystemMouseCursors.click,
-            inlineSpan: TextSpan(
-              text: element.text,
-              style: linkStyle,
-              recognizer: onOpen != null
-                  ? (TapGestureRecognizer()..onTap = () => onOpen(element))
-                  : null,
-            ),
+          return TextSpan(
+            text: buildLinkText == null
+                ? element.text
+                : buildLinkText(element.text),
+            style: linkStyle,
+            recognizer: onOpen != null
+                ? (TapGestureRecognizer()..onTap = () => onOpen(element))
+                : null,
           );
         } else {
-          return WidgetSpan(
-            child: Text.rich(TextSpan(
-              text: element.text,
-              style: style,
-            )),
+          return TextSpan(
+            text: element.text,
+            style: style,
           );
         }
       },
