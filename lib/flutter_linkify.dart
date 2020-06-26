@@ -17,6 +17,9 @@ export 'package:linkify/linkify.dart'
 /// Callback clicked link
 typedef LinkCallback(LinkableElement link);
 
+/// Link text custom builder
+typedef String LinkTextBuilder(String text);
+
 /// Turns URLs into links
 class Linkify extends StatelessWidget {
   /// Text to be linkified
@@ -69,6 +72,9 @@ class Linkify extends StatelessWidget {
   /// Defines how to measure the width of the rendered text.
   final TextWidthBasis textWidthBasis;
 
+  /// Function for dynamic text building
+  final LinkTextBuilder buildLinkText;
+
   const Linkify({
     Key key,
     @required this.text,
@@ -88,6 +94,7 @@ class Linkify extends StatelessWidget {
     this.strutStyle,
     this.locale,
     this.textWidthBasis = TextWidthBasis.parent,
+    this.buildLinkText,
   }) : super(key: key);
 
   @override
@@ -121,6 +128,7 @@ class Linkify extends StatelessWidget {
               decoration: TextDecoration.underline,
             )
             .merge(linkStyle),
+        buildText: buildLinkText,
       ),
     );
   }
@@ -200,6 +208,8 @@ class SelectableLinkify extends StatelessWidget {
 
   final ScrollPhysics scrollPhysics;
 
+  final LinkTextBuilder buildLinkText;
+
   const SelectableLinkify({
     Key key,
     @required this.text,
@@ -227,6 +237,7 @@ class SelectableLinkify extends StatelessWidget {
     this.onTap,
     this.scrollPhysics,
     this.textWidthBasis,
+    this.buildLinkText,
   }) : super(key: key);
 
   @override
@@ -242,6 +253,7 @@ class SelectableLinkify extends StatelessWidget {
         elements,
         style: Theme.of(context).textTheme.bodyText2.merge(style),
         onOpen: onOpen,
+        buildText: buildLinkText,
         linkStyle: Theme.of(context)
             .textTheme
             .bodyText2
@@ -278,13 +290,16 @@ TextSpan buildTextSpan(
   TextStyle style,
   TextStyle linkStyle,
   LinkCallback onOpen,
+  LinkTextBuilder buildLinkText,
 }) {
   return TextSpan(
     children: elements.map<TextSpan>(
       (element) {
         if (element is LinkableElement) {
           return TextSpan(
-            text: element.text,
+            text: buildLinkText == null
+                ? element.text
+                : buildLinkText(element.text),
             style: linkStyle,
             recognizer: onOpen != null
                 ? (TapGestureRecognizer()..onTap = () => onOpen(element))
