@@ -229,7 +229,7 @@ class SelectableLinkify extends StatelessWidget {
   /// Called when the user changes the selection of text (including the cursor location).
   final SelectionChangedCallback? onSelectionChanged;
 
-  final LinkTextBuilder buildLinkText;
+  final LinkTextBuilder? buildLinkText;
 
   const SelectableLinkify({
     Key? key,
