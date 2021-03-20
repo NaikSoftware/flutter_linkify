@@ -19,7 +19,7 @@ export 'package:linkify/linkify.dart'
 typedef LinkCallback = void Function(LinkableElement link);
 
 /// Link text custom builder
-typedef String LinkTextBuilder(String text);
+typedef LinkTextBuilder = String Function(String text);
 
 /// Turns URLs into links
 class Linkify extends StatelessWidget {
@@ -74,7 +74,7 @@ class Linkify extends StatelessWidget {
   final TextWidthBasis textWidthBasis;
 
   /// Function for dynamic text building
-  final LinkTextBuilder buildLinkText;
+  final LinkTextBuilder? buildLinkText;
 
   /// Defines how the paragraph will apply TextStyle.height to the ascent of the first line and descent of the last line.
   final TextHeightBehavior? textHeightBehavior;
@@ -321,7 +321,7 @@ TextSpan buildTextSpan(
   TextStyle? style,
   TextStyle? linkStyle,
   LinkCallback? onOpen,
-  LinkTextBuilder buildLinkText,
+  LinkTextBuilder? buildLinkText,
 }) {
   return TextSpan(
     children: elements.map<TextSpan>(
