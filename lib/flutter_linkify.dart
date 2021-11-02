@@ -329,7 +329,7 @@ TextSpan buildTextSpan(
   LinkTextBuilder? buildLinkText,
 }) {
   return TextSpan(
-    children: elements.map<TextSpan>(
+    children: elements.map<InlineSpan>(
       (element) {
         if (element is LinkableElement) {
           return TextSpan(
