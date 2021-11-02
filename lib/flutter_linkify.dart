@@ -115,7 +115,6 @@ class Linkify extends StatelessWidget {
         elements,
         style: Theme.of(context).textTheme.bodyText2?.merge(style),
         onOpen: onOpen,
-        useMouseRegion: true,
         linkStyle: Theme.of(context)
             .textTheme
             .bodyText2
@@ -328,7 +327,6 @@ TextSpan buildTextSpan(
   TextStyle? linkStyle,
   LinkCallback? onOpen,
   LinkTextBuilder? buildLinkText,
-  bool useMouseRegion = false,
 }) {
   return TextSpan(
     children: elements.map<TextSpan>(
